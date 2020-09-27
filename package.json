@@ -1,0 +1,27 @@
+{
+  "name": "jack-of-all-chains",
+  "version": "0.1.0",
+  "description": "A blockchain that can analyze various consensus mechanisms",
+  "main": "index.js",
+  "scripts": {
+    "start-blockchain": "tsnd --respawn --transpile-only --debug src/blockchain/index.ts",
+    "compile-blockchain": "rimraf ./build && tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prajjwaldimri/jack-of-all-chains.git"
+  },
+  "author": "Prajjwal Dimri",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/prajjwaldimri/jack-of-all-chains/issues"
+  },
+  "homepage": "https://github.com/prajjwaldimri/jack-of-all-chains#readme",
+  "devDependencies": {
+    "@types/node": "^14.11.2",
+    "rimraf": "^3.0.2",
+    "ts-node-dev": "^1.0.0-pre.63",
+    "typescript": "^4.0.3"
+  }
+}
