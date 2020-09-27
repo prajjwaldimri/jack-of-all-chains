@@ -6,7 +6,7 @@
   "scripts": {
     "start-blockchain": "tsnd --respawn --transpile-only --debug src/blockchain/index.ts",
     "compile-blockchain": "rimraf ./build && tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -19,8 +19,11 @@
   },
   "homepage": "https://github.com/prajjwaldimri/jack-of-all-chains#readme",
   "devDependencies": {
+    "@types/jest": "^26.0.14",
     "@types/node": "^14.11.2",
+    "jest": "^26.4.2",
     "rimraf": "^3.0.2",
+    "ts-jest": "^26.4.0",
     "ts-node-dev": "^1.0.0-pre.63",
     "typescript": "^4.0.3"
   }
