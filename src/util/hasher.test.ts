@@ -10,10 +10,13 @@ describe("Hasher test", () => {
     );
   });
 
-  it("should not return equal hashes in case of objects made with same classes", () => {
+  it("produces a new hash even after properties have changed on the input", () => {
     const block1 = new Block(new BlockHeader("test", 1), new BlockData());
-    const block2 = new Block(new BlockHeader("test", 2), new BlockData());
 
-    expect(hasher(block1)).not.toEqual(hasher(block2));
+    const block1Hash = hasher(block1);
+
+    block1.blockHeader.difficulty = 4;
+
+    expect(hasher(block1)).not.toEqual(block1Hash);
   });
 });
