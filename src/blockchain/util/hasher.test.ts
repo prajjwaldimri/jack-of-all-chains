@@ -1,6 +1,6 @@
-import Block from "../blockchain/block";
-import BlockData from "../blockchain/block/blockData";
-import BlockHeader from "../blockchain/block/blockHeader";
+import Block from "../block";
+import BlockData from "../block/blockData";
+import BlockHeader from "../block/blockHeader";
 import hasher from "./hasher";
 
 describe("Hasher test", () => {

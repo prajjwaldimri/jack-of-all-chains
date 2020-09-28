@@ -1,4 +1,4 @@
-import { VERSION } from "../../util/config";
+import { VERSION } from "../util/config";
 
 class BlockHeader {
   public version: string;

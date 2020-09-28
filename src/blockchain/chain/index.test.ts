@@ -1,4 +1,4 @@
-import { GENESIS_BLOCK_DATA } from "../../util/config";
+import { GENESIS_BLOCK_DATA } from "../util/config";
 import Chain from "../chain";
 
 describe("Chain tests", () => {

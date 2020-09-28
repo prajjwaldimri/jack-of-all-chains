@@ -1,6 +1,6 @@
 import BlockData from "./blockData";
 import BlockHeader from "./blockHeader";
-import { GENESIS_BLOCK_DATA } from "../../util/config";
+import { GENESIS_BLOCK_DATA } from "../util/config";
 
 class Block {
   public blockData: BlockData;
