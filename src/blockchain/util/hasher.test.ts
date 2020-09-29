@@ -6,12 +6,16 @@ import hasher from "./hasher";
 describe("Hasher test", () => {
   it("should return correct hash", () => {
     expect(hasher({ test: "data" })).toEqual(
-      "172618156919e4b68b99f63bf1fb576f1b3419ed76e0f95bb97c9c308a1c6d46"
+      "0001011100100110000110000001010101101001000110011110010010110110100010111001100111110110001110111111000111111011010101110110111100011011001101000001100111101101011101101110000011111001010110111011100101111100100111000011000010001010000111000110110101000110"
     );
   });
 
   it("produces a new hash even after properties have changed on the input", () => {
-    const block1 = new Block(new BlockHeader("test", 1), new BlockData());
+    const block1 = new Block(
+      new BlockHeader("test", 1),
+      new BlockData(),
+      "*&*(&*(&"
+    );
 
     const block1Hash = hasher(block1);
 
