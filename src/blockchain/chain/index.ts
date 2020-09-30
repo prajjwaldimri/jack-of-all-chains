@@ -1,5 +1,4 @@
 import Block from "../block";
-import hasher from "../util/hasher";
 
 class Chain {
   public blocks: Block[];
@@ -13,6 +12,12 @@ class Chain {
       return;
     }
     this.blocks.push(block);
+  }
+
+  replaceChain(chain: Chain) {
+    if (Chain.isChainValid(chain) && chain.blocks.length > this.blocks.length) {
+      this.chain = chain;
+    }
   }
 
   static isChainValid(chain: Chain) {
