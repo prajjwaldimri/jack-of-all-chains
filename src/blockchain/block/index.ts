@@ -29,7 +29,33 @@ class Block {
       GENESIS_BLOCK_DATA.nonce,
       GENESIS_BLOCK_DATA.extraNonce
     );
-    return new Block(genesisBlockHeader, new BlockData(), "*--- GENESIS ---* ");
+    return new Block(genesisBlockHeader, new BlockData(), "*--- GENESIS ---*");
+  }
+
+  static isBlockValid(block: Block, prevBlock: Block) {
+    // Check if the difficulty in the incoming block is only increased/decreased by 1
+    if (
+      Math.abs(
+        prevBlock.blockHeader.difficulty - block.blockHeader.difficulty
+      ) > 1
+    ) {
+      return false;
+    }
+
+    // Check if the hash follows the difficulty setting
+    if (
+      block.blockHash.substring(0, block.blockHeader.difficulty) !==
+      "0".repeat(block.blockHeader.difficulty)
+    ) {
+      return false;
+    }
+
+    // Check if the hash of the incoming block is correct
+    if (hasher(block.blockHeader) !== block.blockHash) {
+      return false;
+    }
+
+    return true;
   }
 
   static mineBlock(blockData: BlockData, prevBlock: Block) {

@@ -1,9 +1,8 @@
 import { GENESIS_BLOCK_DATA } from "../util/config";
 import Chain from "../chain";
 import Block from "../block";
-import BlockHeader from "../block/blockHeader";
 import BlockData from "../block/blockData";
-import hasher from "../util/hasher";
+import BlockHeader from "../block/blockHeader";
 
 describe("Chain tests", () => {
   let chain: Chain;
@@ -25,34 +24,72 @@ describe("Chain tests", () => {
     );
   });
 
-  describe("isBlockValid()", () => {
-    let newBlock: Block;
+  describe("addBlock()", () => {
+    let block: Block;
 
     beforeEach(() => {
-      newBlock = Block.mineBlock(new BlockData(), chain.blocks[0]);
+      chain = new Chain();
     });
 
-    it("should return true for a valid block", () => {
-      expect(chain.isBlockValid(newBlock)).toBe(true);
+    it("should add two correct blocks", () => {
+      block = Block.mineBlock(
+        new BlockData(),
+        chain.blocks[chain.blocks.length - 1]
+      );
+      chain.addBlock(block);
+
+      block = Block.mineBlock(
+        new BlockData(),
+        chain.blocks[chain.blocks.length - 1]
+      );
+      chain.addBlock(block);
+
+      expect(chain.blocks.length).toBe(3);
     });
 
-    it("should return false if the difficulty has been jumped", () => {
-      newBlock.blockHeader.difficulty = 10;
+    it("should not add an incorrect block", () => {
+      block = new Block(
+        new BlockHeader(
+          GENESIS_BLOCK_DATA.prevBlockHash,
+          GENESIS_BLOCK_DATA.difficulty + 1
+        ),
+        new BlockData(),
+        "*-- Test --*"
+      );
+      chain.addBlock(block);
+      expect(chain.blocks.length).toBe(1);
+    });
+  });
 
-      expect(chain.isBlockValid(newBlock)).toBe(false);
+  describe("isChainValid()", () => {
+    let block: Block;
+
+    beforeEach(() => {
+      chain = new Chain();
     });
 
-    it("should return false if the hash is wrong", () => {
-      newBlock.blockHash = "*Any wrong hash*";
+    it("should return true for valid chain", () => {
+      block = Block.mineBlock(
+        new BlockData(),
+        chain.blocks[chain.blocks.length - 1]
+      );
+      chain.blocks = [Block.getGenesisBlock(), block];
 
-      expect(chain.isBlockValid(newBlock)).toBe(false);
+      expect(Chain.isChainValid(chain)).toBe(true);
     });
 
-    it("should return false if the hash is valid but doesn't comply with the difficulty parameter", () => {
-      newBlock.blockHeader.difficulty = 10;
-      newBlock.blockHash = hasher(newBlock.blockHeader);
+    it("should return false for invalid chain", () => {
+      block = new Block(
+        new BlockHeader(
+          GENESIS_BLOCK_DATA.prevBlockHash,
+          GENESIS_BLOCK_DATA.difficulty + 1
+        ),
+        new BlockData(),
+        "*-- Test --*"
+      );
+      chain.blocks = [Block.getGenesisBlock(), block];
 
-      expect(chain.isBlockValid(newBlock)).toBe(false);
+      expect(Chain.isChainValid(chain)).toBe(false);
     });
   });
 });
