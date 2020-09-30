@@ -16,7 +16,7 @@ class Chain {
 
   replaceChain(chain: Chain) {
     if (Chain.isChainValid(chain) && chain.blocks.length > this.blocks.length) {
-      this.chain = chain;
+      this.blocks = chain.blocks;
     }
   }
 
