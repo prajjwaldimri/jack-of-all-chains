@@ -13,8 +13,8 @@ import TransactionPool from "../blockchain/wallet/transactionPool";
 
 let wallet = new Wallet();
 let chain = new Chain();
-let pubsub = new Pubsub();
 let transactionPool = new TransactionPool();
+let pubsub = new Pubsub(transactionPool, chain);
 
 app.get("/api/chain", (req, res) => {
   res.status(200).json(chain);
@@ -22,6 +22,17 @@ app.get("/api/chain", (req, res) => {
 
 app.get("/api/transaction-pool", (req, res) => {
   res.status(200).json(transactionPool);
+});
+
+app.post("/api/transact", (req, res) => {
+  const { data } = req.body;
+
+  const transaction = wallet.createTransaction(data);
+  transactionPool.addTransaction(transaction);
+
+  pubsub.broadcastTransaction(transaction);
+
+  res.status(200).json(transaction);
 });
 
 const DEFAULT_PORT = 3333;
@@ -33,7 +44,7 @@ async function syncWithRoot() {
   response = await getJSON(
     `http://localhost:${DEFAULT_PORT}/api/transaction-pool`
   );
-  transactionPool = response as TransactionPool;
+  transactionPool.setTransactions(response as TransactionPool);
 }
 
 let PORT = 3333;

@@ -1,5 +1,7 @@
+import Transaction from "../wallet/transaction";
+
 class BlockData {
-  public transactions: string[] = [];
+  public transactions: Transaction[] = [];
 }
 
 export default BlockData;
