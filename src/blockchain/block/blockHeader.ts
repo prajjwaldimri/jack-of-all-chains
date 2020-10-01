@@ -7,13 +7,15 @@ class BlockHeader {
   public nonce: number;
   public extraNonce: number;
   public difficulty: number;
+  public dataHash: string;
 
   constructor(
     prevBlockHash: string,
     difficulty: number,
     timestamp?: number,
     nonce?: number,
-    extraNonce?: number
+    extraNonce?: number,
+    dataHash?: string
   ) {
     this.version = VERSION;
     this.prevBlockHash = prevBlockHash;
@@ -21,6 +23,7 @@ class BlockHeader {
     this.nonce = nonce || 1;
     this.extraNonce = extraNonce || 0;
     this.difficulty = difficulty || 10;
+    this.dataHash = dataHash || "";
   }
 }
 

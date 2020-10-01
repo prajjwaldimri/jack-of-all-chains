@@ -55,6 +55,11 @@ class Block {
       return false;
     }
 
+    // Check if the hash of blockData is correct
+    if (hasher(block.blockData) !== block.blockHeader.dataHash) {
+      return false;
+    }
+
     return true;
   }
 
@@ -66,6 +71,7 @@ class Block {
         : prevBlock.blockHeader.difficulty + 1;
 
     let blockHeader = new BlockHeader(prevBlock.blockHash, difficulty);
+    blockHeader.dataHash = hasher(blockData);
 
     let time = process.hrtime();
 
