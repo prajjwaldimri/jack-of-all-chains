@@ -1,18 +1,22 @@
-import Block from ".";
-import BlockData from "./blockData";
+import Block from "../block";
+import BlockData from "../block/blockData";
 import BlockHeader from "../block/blockHeader";
 import hasher from "../util/hasher";
+import Consensus from "./consensus";
+import ProofOfWork from "./proof-of-work";
 
-describe("Block Tests", () => {
+describe("Proof of work tests", () => {
   let firstBlock: Block;
+  let consensus: Consensus;
 
   beforeEach(() => {
-    firstBlock = Block.getGenesisBlock();
+    consensus = new ProofOfWork();
+    firstBlock = consensus.getGenesisBlock();
   });
 
   describe("mineBlock()", () => {
     it("should mine a block properly", () => {
-      let block = Block.mineBlock(new BlockData(), firstBlock);
+      let block = consensus.createBlock(new BlockData(), firstBlock);
 
       expect(
         block.blockHash.substring(0, block.blockHeader.difficulty)
@@ -26,30 +30,30 @@ describe("Block Tests", () => {
     let newBlock: Block;
 
     beforeEach(() => {
-      newBlock = Block.mineBlock(new BlockData(), firstBlock);
+      newBlock = consensus.createBlock(new BlockData(), firstBlock);
     });
 
     it("should return true for a valid block", () => {
-      expect(Block.isBlockValid(newBlock, firstBlock)).toBe(true);
+      expect(consensus.isBlockValid(newBlock, firstBlock)).toBe(true);
     });
 
     it("should return false if the difficulty has been jumped", () => {
       newBlock.blockHeader.difficulty = 10;
 
-      expect(Block.isBlockValid(newBlock, firstBlock)).toBe(false);
+      expect(consensus.isBlockValid(newBlock, firstBlock)).toBe(false);
     });
 
     it("should return false if the hash is wrong", () => {
       newBlock.blockHash = "*Any wrong hash*";
 
-      expect(Block.isBlockValid(newBlock, firstBlock)).toBe(false);
+      expect(consensus.isBlockValid(newBlock, firstBlock)).toBe(false);
     });
 
     it("should return false if the hash is valid but doesn't comply with the difficulty parameter", () => {
       newBlock.blockHeader.difficulty = 10;
       newBlock.blockHash = hasher(newBlock.blockHeader);
 
-      expect(Block.isBlockValid(newBlock, firstBlock)).toBe(false);
+      expect(consensus.isBlockValid(newBlock, firstBlock)).toBe(false);
     });
   });
 });

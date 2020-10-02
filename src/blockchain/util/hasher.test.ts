@@ -1,6 +1,7 @@
 import Block from "../block";
 import BlockData from "../block/blockData";
 import BlockHeader from "../block/blockHeader";
+import ProofOfWork from "../consensus/proof-of-work";
 import hasher from "./hasher";
 
 describe("Hasher test", () => {
@@ -14,7 +15,8 @@ describe("Hasher test", () => {
     const block1 = new Block(
       new BlockHeader("test", 1),
       new BlockData(),
-      "*&*(&*(&"
+      "*&*(&*(&",
+      new ProofOfWork()
     );
 
     const block1Hash = hasher(block1);

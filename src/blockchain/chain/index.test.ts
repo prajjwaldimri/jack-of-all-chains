@@ -3,12 +3,13 @@ import Chain from "../chain";
 import Block from "../block";
 import BlockData from "../block/blockData";
 import BlockHeader from "../block/blockHeader";
+import ProofOfWork from "../consensus/proof-of-work";
 
 describe("Chain tests", () => {
   let chain: Chain;
 
   beforeEach(() => {
-    chain = new Chain();
+    chain = new Chain(new ProofOfWork());
   });
 
   it("should create a genesis block for each new chain", () => {
@@ -28,17 +29,17 @@ describe("Chain tests", () => {
     let block: Block;
 
     beforeEach(() => {
-      chain = new Chain();
+      chain = new Chain(new ProofOfWork());
     });
 
     it("should add two correct blocks", () => {
-      block = Block.mineBlock(
+      block = chain.consensus.createBlock(
         new BlockData(),
         chain.blocks[chain.blocks.length - 1]
       );
       chain.addBlock(block);
 
-      block = Block.mineBlock(
+      block = chain.consensus.createBlock(
         new BlockData(),
         chain.blocks[chain.blocks.length - 1]
       );
@@ -54,7 +55,8 @@ describe("Chain tests", () => {
           GENESIS_BLOCK_DATA.difficulty + 1
         ),
         new BlockData(),
-        "*-- Test --*"
+        "*-- Test --*",
+        new ProofOfWork()
       );
       chain.addBlock(block);
       expect(chain.blocks.length).toBe(1);
@@ -65,17 +67,17 @@ describe("Chain tests", () => {
     let block: Block;
 
     beforeEach(() => {
-      chain = new Chain();
+      chain = new Chain(new ProofOfWork());
     });
 
     it("should return true for valid chain", () => {
-      block = Block.mineBlock(
+      block = chain.consensus.createBlock(
         new BlockData(),
         chain.blocks[chain.blocks.length - 1]
       );
-      chain.blocks = [Block.getGenesisBlock(), block];
+      chain.blocks = [chain.consensus.getGenesisBlock(), block];
 
-      expect(Chain.isChainValid(chain)).toBe(true);
+      expect(chain.consensus.isChainValid(chain)).toBe(true);
     });
 
     it("should return false for invalid chain", () => {
@@ -85,11 +87,12 @@ describe("Chain tests", () => {
           GENESIS_BLOCK_DATA.difficulty + 1
         ),
         new BlockData(),
-        "*-- Test --*"
+        "*-- Test --*",
+        new ProofOfWork()
       );
-      chain.blocks = [Block.getGenesisBlock(), block];
+      chain.blocks = [chain.consensus.getGenesisBlock(), block];
 
-      expect(Chain.isChainValid(chain)).toBe(false);
+      expect(chain.consensus.isChainValid(chain)).toBe(false);
     });
   });
 });

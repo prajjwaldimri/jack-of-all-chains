@@ -10,9 +10,10 @@ import Wallet from "../blockchain/wallet";
 import Pubsub from "./pubsub";
 import Chain from "../blockchain/chain";
 import TransactionPool from "../blockchain/wallet/transactionPool";
+import ProofOfWork from "../blockchain/consensus/proof-of-work";
 
 let wallet = new Wallet();
-let chain = new Chain();
+let chain = new Chain(new ProofOfWork());
 let transactionPool = new TransactionPool();
 let pubsub = new Pubsub(transactionPool, chain);
 
