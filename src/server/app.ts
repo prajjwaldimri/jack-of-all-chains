@@ -8,12 +8,11 @@ const getJSON = bent("json");
 
 import Wallet from "../blockchain/wallet";
 import Pubsub from "./pubsub";
-import Chain from "../blockchain/chain";
+import { POW_Chain } from "../blockchain/proof-of-work";
 import TransactionPool from "../blockchain/wallet/transactionPool";
-import ProofOfWork from "../blockchain/consensus/proof-of-work";
 
 let wallet = new Wallet();
-let chain = new Chain(new ProofOfWork());
+let chain = new POW_Chain();
 let transactionPool = new TransactionPool();
 let pubsub = new Pubsub(transactionPool, chain);
 
@@ -40,7 +39,7 @@ const DEFAULT_PORT = 3333;
 
 async function syncWithRoot() {
   let response = await getJSON(`http://localhost:${DEFAULT_PORT}/api/chain`);
-  chain.replaceChain(response as Chain);
+  chain.replaceChain(response as POW_Chain);
 
   response = await getJSON(
     `http://localhost:${DEFAULT_PORT}/api/transaction-pool`

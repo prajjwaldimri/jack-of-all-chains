@@ -1,22 +1,18 @@
-import Block from "../block";
+import POW_Block from "../block";
 import BlockData from "../block/blockData";
 import BlockHeader from "../block/blockHeader";
-import hasher from "../util/hasher";
-import Consensus from "./consensus";
-import ProofOfWork from "./proof-of-work";
+import hasher from "../../util/hasher";
 
 describe("Proof of work tests", () => {
-  let firstBlock: Block;
-  let consensus: Consensus;
+  let firstBlock: POW_Block;
 
   beforeEach(() => {
-    consensus = new ProofOfWork();
-    firstBlock = consensus.getGenesisBlock();
+    firstBlock = POW_Block.getGenesisBlock();
   });
 
   describe("mineBlock()", () => {
     it("should mine a block properly", () => {
-      let block = consensus.createBlock(new BlockData(), firstBlock);
+      let block = POW_Block.createBlock(new BlockData(), firstBlock);
 
       expect(
         block.blockHash.substring(0, block.blockHeader.difficulty)
@@ -27,33 +23,33 @@ describe("Proof of work tests", () => {
   });
 
   describe("isBlockValid()", () => {
-    let newBlock: Block;
+    let newBlock: POW_Block;
 
     beforeEach(() => {
-      newBlock = consensus.createBlock(new BlockData(), firstBlock);
+      newBlock = POW_Block.createBlock(new BlockData(), firstBlock);
     });
 
     it("should return true for a valid block", () => {
-      expect(consensus.isBlockValid(newBlock, firstBlock)).toBe(true);
+      expect(POW_Block.isBlockValid(newBlock, firstBlock)).toBe(true);
     });
 
     it("should return false if the difficulty has been jumped", () => {
       newBlock.blockHeader.difficulty = 10;
 
-      expect(consensus.isBlockValid(newBlock, firstBlock)).toBe(false);
+      expect(POW_Block.isBlockValid(newBlock, firstBlock)).toBe(false);
     });
 
     it("should return false if the hash is wrong", () => {
       newBlock.blockHash = "*Any wrong hash*";
 
-      expect(consensus.isBlockValid(newBlock, firstBlock)).toBe(false);
+      expect(POW_Block.isBlockValid(newBlock, firstBlock)).toBe(false);
     });
 
     it("should return false if the hash is valid but doesn't comply with the difficulty parameter", () => {
       newBlock.blockHeader.difficulty = 10;
       newBlock.blockHash = hasher(newBlock.blockHeader);
 
-      expect(consensus.isBlockValid(newBlock, firstBlock)).toBe(false);
+      expect(POW_Block.isBlockValid(newBlock, firstBlock)).toBe(false);
     });
   });
 });

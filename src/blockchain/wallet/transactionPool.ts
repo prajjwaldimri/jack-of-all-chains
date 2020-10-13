@@ -1,4 +1,4 @@
-import Chain from "../chain";
+import POW_Chain from "../proof-of-work/chain";
 import Transaction from "./transaction";
 
 class TransactionPool {
@@ -18,7 +18,7 @@ class TransactionPool {
     this.transactions = transactionPool.transactions;
   }
 
-  clearBlockchainTransactions(chain: Chain) {
+  clearBlockchainTransactions(chain: POW_Chain) {
     for (const block of chain.blocks) {
       for (const transaction of block.blockData.transactions) {
         if (this.transactions[transaction.id]) {

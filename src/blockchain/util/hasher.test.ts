@@ -1,7 +1,6 @@
-import Block from "../block";
-import BlockData from "../block/blockData";
-import BlockHeader from "../block/blockHeader";
-import ProofOfWork from "../consensus/proof-of-work";
+import POW_Block from "../proof-of-work/block";
+import BlockData from "../proof-of-work/block/blockData";
+import BlockHeader from "../proof-of-work/block/blockHeader";
 import hasher from "./hasher";
 
 describe("Hasher test", () => {
@@ -12,11 +11,10 @@ describe("Hasher test", () => {
   });
 
   it("produces a new hash even after properties have changed on the input", () => {
-    const block1 = new Block(
+    const block1 = new POW_Block(
       new BlockHeader("test", 1),
       new BlockData(),
-      "*&*(&*(&",
-      new ProofOfWork()
+      "*&*(&*(&"
     );
 
     const block1Hash = hasher(block1);

@@ -1,45 +1,46 @@
-import { GENESIS_BLOCK_DATA } from "../util/config";
-import Chain from "../chain";
-import Block from "../block";
+import { GENESIS_BLOCK_DATA_POW } from "../../util/config";
+import POW_Chain from ".";
+import POW_Block from "../block";
 import BlockData from "../block/blockData";
 import BlockHeader from "../block/blockHeader";
-import ProofOfWork from "../consensus/proof-of-work";
 
 describe("Chain tests", () => {
-  let chain: Chain;
+  let chain: POW_Chain;
 
   beforeEach(() => {
-    chain = new Chain(new ProofOfWork());
+    chain = new POW_Chain();
   });
 
   it("should create a genesis block for each new chain", () => {
-    expect(chain.blocks[0].blockHeader.nonce).toEqual(GENESIS_BLOCK_DATA.nonce);
+    expect(chain.blocks[0].blockHeader.nonce).toEqual(
+      GENESIS_BLOCK_DATA_POW.nonce
+    );
     expect(chain.blocks[0].blockHeader.prevBlockHash).toEqual(
-      GENESIS_BLOCK_DATA.prevBlockHash
+      GENESIS_BLOCK_DATA_POW.prevBlockHash
     );
     expect(chain.blocks[0].blockHeader.timestamp).toEqual(
-      GENESIS_BLOCK_DATA.timestamp
+      GENESIS_BLOCK_DATA_POW.timestamp
     );
     expect(chain.blocks[0].blockHeader.difficulty).toEqual(
-      GENESIS_BLOCK_DATA.difficulty
+      GENESIS_BLOCK_DATA_POW.difficulty
     );
   });
 
   describe("addBlock()", () => {
-    let block: Block;
+    let block: POW_Block;
 
     beforeEach(() => {
-      chain = new Chain(new ProofOfWork());
+      chain = new POW_Chain();
     });
 
     it("should add two correct blocks", () => {
-      block = chain.consensus.createBlock(
+      block = POW_Block.createBlock(
         new BlockData(),
         chain.blocks[chain.blocks.length - 1]
       );
       chain.addBlock(block);
 
-      block = chain.consensus.createBlock(
+      block = POW_Block.createBlock(
         new BlockData(),
         chain.blocks[chain.blocks.length - 1]
       );
@@ -49,14 +50,13 @@ describe("Chain tests", () => {
     });
 
     it("should not add an incorrect block", () => {
-      block = new Block(
+      block = new POW_Block(
         new BlockHeader(
-          GENESIS_BLOCK_DATA.prevBlockHash,
-          GENESIS_BLOCK_DATA.difficulty + 1
+          GENESIS_BLOCK_DATA_POW.prevBlockHash,
+          GENESIS_BLOCK_DATA_POW.difficulty + 1
         ),
         new BlockData(),
-        "*-- Test --*",
-        new ProofOfWork()
+        "*-- Test --*"
       );
       chain.addBlock(block);
       expect(chain.blocks.length).toBe(1);
@@ -64,35 +64,34 @@ describe("Chain tests", () => {
   });
 
   describe("isChainValid()", () => {
-    let block: Block;
+    let block: POW_Block;
 
     beforeEach(() => {
-      chain = new Chain(new ProofOfWork());
+      chain = new POW_Chain();
     });
 
     it("should return true for valid chain", () => {
-      block = chain.consensus.createBlock(
+      block = POW_Block.createBlock(
         new BlockData(),
         chain.blocks[chain.blocks.length - 1]
       );
-      chain.blocks = [chain.consensus.getGenesisBlock(), block];
+      chain.blocks = [POW_Block.getGenesisBlock(), block];
 
-      expect(chain.consensus.isChainValid(chain)).toBe(true);
+      expect(POW_Chain.isChainValid(chain)).toBe(true);
     });
 
     it("should return false for invalid chain", () => {
-      block = new Block(
+      block = new POW_Block(
         new BlockHeader(
-          GENESIS_BLOCK_DATA.prevBlockHash,
-          GENESIS_BLOCK_DATA.difficulty + 1
+          GENESIS_BLOCK_DATA_POW.prevBlockHash,
+          GENESIS_BLOCK_DATA_POW.difficulty + 1
         ),
         new BlockData(),
-        "*-- Test --*",
-        new ProofOfWork()
+        "*-- Test --*"
       );
-      chain.blocks = [chain.consensus.getGenesisBlock(), block];
+      chain.blocks = [POW_Block.getGenesisBlock(), block];
 
-      expect(chain.consensus.isChainValid(chain)).toBe(false);
+      expect(POW_Chain.isChainValid(chain)).toBe(false);
     });
   });
 });

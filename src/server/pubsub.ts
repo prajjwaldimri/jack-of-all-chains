@@ -1,5 +1,5 @@
 import redis, { RedisClient } from "redis";
-import Chain from "../blockchain/chain";
+import POW_Chain from "../blockchain/proof-of-work/chain";
 import Transaction from "../blockchain/wallet/transaction";
 import TransactionPool from "../blockchain/wallet/transactionPool";
 
@@ -12,7 +12,10 @@ class Pubsub {
   private publisher: RedisClient;
   private subscriber: RedisClient;
 
-  constructor(public transactionPool: TransactionPool, public chain: Chain) {
+  constructor(
+    public transactionPool: TransactionPool,
+    public chain: POW_Chain
+  ) {
     this.publisher = redis.createClient();
     this.subscriber = redis.createClient();
 
@@ -33,9 +36,9 @@ class Pubsub {
 
     switch (channel) {
       case CHANNELS.BLOCKCHAIN:
-        this.chain.replaceChain(parsedMessage as Chain);
+        this.chain.replaceChain(parsedMessage as POW_Chain);
         this.transactionPool.clearBlockchainTransactions(
-          parsedMessage as Chain
+          parsedMessage as POW_Chain
         );
         break;
 

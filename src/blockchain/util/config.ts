@@ -1,4 +1,4 @@
-const GENESIS_BLOCK_DATA = {
+const GENESIS_BLOCK_DATA_POW = {
   timestamp: 1,
   prevBlockHash: "---",
   difficulty: 3,
@@ -8,4 +8,4 @@ const GENESIS_BLOCK_DATA = {
 
 const VERSION: string = "0.1.0";
 
-export { GENESIS_BLOCK_DATA, VERSION };
+export { GENESIS_BLOCK_DATA_POW, VERSION };
