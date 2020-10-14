@@ -8,8 +8,9 @@ const getJSON = bent("json");
 
 import Wallet from "../blockchain/wallet";
 import Pubsub from "./pubsub";
-import { POW_Chain } from "../blockchain/proof-of-work";
+import { POW_Block, POW_Chain } from "../blockchain/proof-of-work";
 import TransactionPool from "../blockchain/wallet/transactionPool";
+import BlockData from "../blockchain/proof-of-work/block/blockData";
 
 let wallet = new Wallet();
 let chain = new POW_Chain();
@@ -36,12 +37,25 @@ app.post("/api/transact", (req, res) => {
 });
 
 // POW Endpoints
-app.post("/api/addBlock", (req, res) => {
+app.post("/api/pow/mineBlock", (req, res) => {
+  const { data } = req.body;
+
+  res.json(
+    POW_Block.createBlock(
+      new BlockData(data),
+      chain.blocks[chain.blocks.length - 1]
+    )
+  );
+});
+
+app.post("/api/pow/addBlock", (req, res) => {
   const { data } = req.body;
 
   chain.addBlock(data);
 
-  res.redirect("/api/chain");
+  pubsub.broadcastChain();
+
+  res.json(chain);
 });
 
 // POS Endpoints

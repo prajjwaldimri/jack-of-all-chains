@@ -21,9 +21,9 @@ class TransactionPool {
 
   clearBlockchainTransactions(chain: POW_Chain | POS_Chain) {
     for (const block of chain.blocks) {
-      for (const transaction of block.blockData.transactions) {
-        if (this.transactions[transaction.id]) {
-          delete this.transactions[transaction.id];
+      for (const transaction in block.blockData.transactions) {
+        if (this.transactions[transaction]) {
+          delete this.transactions[transaction];
         }
       }
     }

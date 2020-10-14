@@ -46,17 +46,34 @@ setTimeout(() => {
 /* Node Emulation Logic */
 
 setTimeout(async () => {
-  for (let i = 0; i < 10; i++) {
-    // Create transactions
-    const post = bent(`http://localhost:3333/`, "POST", "json", 200);
-    await post("api/transact", {
-      data: { transactionValue: Math.random() * 100 },
-    });
-  }
+  try {
+    for (let i = 0; i < 40; i++) {
+      // Create transactions
+      const post = bent(`http://localhost:3333/`, "POST", "json", 200);
+      await post("api/transact", {
+        data: { transactionValue: Math.random() * 100 },
+      });
+    }
 
-  console.log(
-    await getJSON(`http://localhost:${peer_ports[2]}/api/transaction-pool`)
-  );
+    // Proof of Work Simulation
+    const transactionPool = await getJSON(
+      `http://localhost:3333/api/transaction-pool`
+    );
+
+    const postPeer1 = bent(
+      `http://localhost:${peer_ports[0]}/`,
+      "POST",
+      "json",
+      200
+    );
+    const block = await postPeer1("api/pow/mineBlock", {
+      data: transactionPool.transactions,
+    });
+
+    await postPeer1("api/pow/addBlock", { data: block });
+  } catch (err) {
+    console.log(err);
+  }
 }, 3000);
 
 /* Cleanup Logic */
