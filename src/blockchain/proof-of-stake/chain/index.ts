@@ -8,7 +8,7 @@ class POS_Chain {
   }
 
   addBlock(block: POS_Block) {
-    if (!POS_Block.isBlockValid(block, this.blocks[this.blocks.length - 1])) {
+    if (!POS_Block.isBlockValid(block)) {
       return;
     }
     this.blocks.push(block);
@@ -25,7 +25,7 @@ class POS_Chain {
 
   static isChainValid(chain: POS_Chain) {
     for (let i = 1; i < chain.blocks.length; i++) {
-      if (!POS_Block.isBlockValid(chain.blocks[i], chain.blocks[i - 1])) {
+      if (!POS_Block.isBlockValid(chain.blocks[i])) {
         return false;
       }
     }

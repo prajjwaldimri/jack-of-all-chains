@@ -1,7 +1,9 @@
+import { GENESIS_BLOCK_DATA_POS } from "../../util/config";
+import hasher from "../../util/hasher";
 import BlockData from "./blockData";
 import BlockHeader from "./blockHeader";
 
-class POS_BLOCK {
+class POS_Block {
   public blockData: BlockData;
   public blockHeader: BlockHeader;
   public blockHash: string;
@@ -16,11 +18,43 @@ class POS_BLOCK {
     this.blockHash = blockHash;
   }
 
-  static isBlockValid(block: POS_BLOCK, prevBlock: POS_BLOCK): boolean {}
+  static isBlockValid(block: POS_Block): boolean {
+    // Check if the hash of the incoming block is correct
+    if (hasher(block.blockHeader) !== block.blockHash) {
+      return false;
+    }
 
-  static getGenesisBlock(): POS_BLOCK {}
+    // Check if the hash of blockData is correct
+    if (hasher(block.blockData) !== block.blockHeader.dataHash) {
+      return false;
+    }
 
-  static createBlock(): POS_BLOCK {}
+    return true;
+  }
+
+  static getGenesisBlock(): POS_Block {
+    const genesisBlockHeader = new BlockHeader(
+      GENESIS_BLOCK_DATA_POS.prevBlockHash,
+      GENESIS_BLOCK_DATA_POS.timestamp
+    );
+    return new POS_Block(
+      genesisBlockHeader,
+      new BlockData(),
+      "*--- GENESIS ---*"
+    );
+  }
+
+  static createBlock(blockData: BlockData, prevBlock: POS_Block): POS_Block {
+    let hash = "";
+
+    let blockHeader = new BlockHeader(prevBlock.blockHash);
+    blockHeader.dataHash = hasher(blockData);
+
+    blockHeader.timestamp = Date.now();
+    hash = hasher(blockHeader);
+
+    return new POS_Block(blockHeader, blockData, hash);
+  }
 }
 
-export default POS_BLOCK;
+export default POS_Block;

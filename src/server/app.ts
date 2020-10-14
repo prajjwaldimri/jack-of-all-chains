@@ -35,6 +35,10 @@ app.post("/api/transact", (req, res) => {
   res.status(200).json(transaction);
 });
 
+// POW Endpoints
+
+// POS Endpoints
+
 const DEFAULT_PORT = 3333;
 
 async function syncWithRoot() {
