@@ -6,6 +6,7 @@ const getJSON = bent("json");
 const peer_ports = [10000, 10001, 10002];
 const p2p_ports = [5001, 5002, 5003];
 
+/* Startup Logic */
 const server = spawn("npm", ["run", "start-server"]);
 let peer1, peer2, peer3;
 
@@ -15,7 +16,7 @@ setTimeout(() => {
       PATH: process.env.PATH,
       PEER_PORT: peer_ports[0],
       P2P_PORT: p2p_ports[0],
-      PEERS: `ws://localhost:${p2p_ports[0]}`,
+      PEERS: `ws://localhost:5000`,
     },
   });
 }, 100);
@@ -26,7 +27,7 @@ setTimeout(() => {
       PATH: process.env.PATH,
       PEER_PORT: peer_ports[1],
       P2P_PORT: p2p_ports[1],
-      PEERS: `ws://localhost:${p2p_ports[0]},ws://localhost:${p2p_ports[1]}`,
+      PEERS: `ws://localhost:5000,ws://localhost:${p2p_ports[0]}`,
     },
   });
 }, 200);
@@ -37,12 +38,26 @@ setTimeout(() => {
       PATH: process.env.PATH,
       PEER_PORT: peer_ports[2],
       P2P_PORT: p2p_ports[2],
-      PEERS: `ws://localhost:${p2p_ports[0]},ws://localhost:${p2p_ports[1]},ws://localhost:${p2p_ports[2]}`,
+      PEERS: `ws://localhost:5000,ws://localhost:${p2p_ports[0]},ws://localhost:${p2p_ports[1]}`,
     },
   });
 }, 300);
 
-setTimeout(() => {}, 500);
+/* Node Emulation Logic */
+
+setTimeout(async () => {
+  for (let i = 0; i < 10; i++) {
+    // Create transactions
+    const post = bent(`http://localhost:3333/`, "POST", "json", 200);
+    await post("api/transact", {
+      data: { transactionValue: Math.random() * 100 },
+    });
+  }
+
+  console.log(
+    await getJSON(`http://localhost:${peer_ports[2]}/api/transaction-pool`)
+  );
+}, 3000);
 
 /* Cleanup Logic */
 setTimeout(() => {
