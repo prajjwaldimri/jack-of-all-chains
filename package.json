@@ -6,7 +6,7 @@
   "scripts": {
     "start-blockchain": "tsnd --respawn --transpile-only --debug src/blockchain/index.ts",
     "compile-blockchain": "rimraf ./build && tsc",
-    "start-server": "npm run start-redis && tsnd --respawn --transpile-only src/server/app.ts",
+    "start-server": "tsnd --respawn --transpile-only src/server/app.ts",
     "start-peer": "cross-env GENERATE_PEER_PORT='true' tsnd --respawn --transpile-only src/server/app.ts",
     "start-redis": "redis-server --daemonize yes",
     "test": "jest --watch"
@@ -28,7 +28,6 @@
     "@types/jest": "^26.0.14",
     "@types/node": "^14.11.2",
     "@types/pubsub-js": "^1.8.1",
-    "@types/redis": "^2.8.27",
     "jest": "^26.4.2",
     "rimraf": "^3.0.2",
     "ts-jest": "^26.4.0",
@@ -36,13 +35,14 @@
     "typescript": "^4.0.3"
   },
   "dependencies": {
+    "@types/ws": "^7.2.7",
     "bent": "^7.3.10",
     "body-parser": "^1.19.0",
     "cross-env": "^7.0.2",
     "elliptic": "^6.5.3",
     "express": "^4.17.1",
     "nanoid": "^3.1.12",
-    "redis": "^3.0.2",
-    "sha3": "^2.1.3"
+    "sha3": "^2.1.3",
+    "ws": "^7.3.1"
   }
 }

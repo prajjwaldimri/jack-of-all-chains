@@ -1,4 +1,5 @@
-import redis, { RedisClient } from "redis";
+import WebSocket, { Server } from "ws";
+import POS_Chain from "../blockchain/proof-of-stake/chain";
 import POW_Chain from "../blockchain/proof-of-work/chain";
 import Transaction from "../blockchain/wallet/transaction";
 import TransactionPool from "../blockchain/wallet/transactionPool";
@@ -8,42 +9,67 @@ const CHANNELS = {
   TRANSACTION: "TRANSACTION",
 };
 
+interface Message {
+  type: String;
+  transaction?: Transaction;
+  chain?: POS_Chain | POW_Chain;
+}
+
+const P2P_PORT = process.env.P2P_PORT
+  ? Number.parseInt(process.env.P2P_PORT)
+  : 5001;
+
+const peers = process.env.PEERS ? process.env.PEERS?.split(",") : [];
+
 class Pubsub {
-  private publisher: RedisClient;
-  private subscriber: RedisClient;
+  public server: Server;
+  public sockets: WebSocket[];
 
   constructor(
     public transactionPool: TransactionPool,
-    public chain: POW_Chain
+    public chain: POW_Chain | POS_Chain
   ) {
-    this.publisher = redis.createClient();
-    this.subscriber = redis.createClient();
+    this.server = new WebSocket.Server({ port: P2P_PORT });
+    this.sockets = [];
 
-    this.subscribeToChannels();
-    this.subscriber.on("message", (channel, message) =>
-      this.handleMessage(channel, message)
-    );
+    this.server.on("connection", (socket) => this.connectSocket(socket));
+
+    this.connectToPeers();
   }
 
-  subscribeToChannels() {
-    Object.values(CHANNELS).forEach((channel) => {
-      this.subscriber.subscribe(channel);
+  connectSocket(socket: WebSocket) {
+    this.sockets.push(socket);
+
+    socket.on("message", (data) => this.handleMessage(data as string));
+  }
+
+  connectToPeers() {
+    peers.forEach((peer) => {
+      const socket = new WebSocket(peer);
+
+      socket.on("open", () => this.connectSocket(socket));
     });
   }
 
-  handleMessage(channel: string, data: string) {
-    let parsedMessage = JSON.parse(data);
+  handleMessage(data: string) {
+    let parsedMessage = JSON.parse(data) as Message;
 
-    switch (channel) {
+    switch (parsedMessage.type) {
       case CHANNELS.BLOCKCHAIN:
-        this.chain.replaceChain(parsedMessage as POW_Chain);
+        if (this.chain instanceof POW_Chain) {
+          this.chain.replaceChain(parsedMessage.chain as POW_Chain);
+        } else if (this.chain instanceof POS_Chain) {
+          this.chain.replaceChain(parsedMessage.chain as POS_Chain);
+        }
         this.transactionPool.clearBlockchainTransactions(
-          parsedMessage as POW_Chain
+          parsedMessage.chain as POW_Chain | POS_Chain
         );
         break;
 
       case CHANNELS.TRANSACTION:
-        this.transactionPool.addTransaction(parsedMessage as Transaction);
+        this.transactionPool.addTransaction(
+          parsedMessage.transaction as Transaction
+        );
         break;
 
       default:
@@ -51,20 +77,30 @@ class Pubsub {
     }
   }
 
-  publish(channel: string, message: string) {
-    this.subscriber.unsubscribe(channel, () => {
-      this.publisher.publish(channel, message, () => {
-        this.subscriber.subscribe(channel);
-      });
-    });
+  broadcastTransaction(transaction: Transaction) {
+    this.sockets.forEach((socket) => this.sendTransaction(transaction, socket));
   }
 
-  broadcastTransaction(transaction: Transaction) {
-    this.publish(CHANNELS.TRANSACTION, JSON.stringify(transaction));
+  sendTransaction(transaction: Transaction, socket: WebSocket) {
+    const message: Message = {
+      type: CHANNELS.TRANSACTION,
+      transaction: transaction,
+    };
+
+    socket.send(JSON.stringify(message));
+  }
+
+  sendChain(chain: POS_Chain | POW_Chain, socket: WebSocket) {
+    const message: Message = {
+      type: CHANNELS.BLOCKCHAIN,
+      chain: chain,
+    };
+
+    socket.send(JSON.stringify(message));
   }
 
   broadcastChain() {
-    this.publish(CHANNELS.BLOCKCHAIN, JSON.stringify(this.chain));
+    this.sockets.forEach((socket) => this.sendChain(this.chain, socket));
   }
 }
 
