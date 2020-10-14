@@ -36,6 +36,13 @@ app.post("/api/transact", (req, res) => {
 });
 
 // POW Endpoints
+app.post("/api/addBlock", (req, res) => {
+  const { data } = req.body;
+
+  chain.addBlock(data);
+
+  res.redirect("/api/chain");
+});
 
 // POS Endpoints
 
@@ -51,10 +58,7 @@ async function syncWithRoot() {
   transactionPool.setTransactions(response as TransactionPool);
 }
 
-let PORT = 3333;
-if (process.env.GENERATE_PEER_PORT === "true") {
-  PORT = PORT + Math.ceil(Math.random() * 1000);
-}
+let PORT = process.env.PEER_PORT || 3333;
 
 app.listen(PORT, () => {
   console.info(`Server started on ${PORT}`);

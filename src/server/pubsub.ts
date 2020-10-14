@@ -17,7 +17,7 @@ interface Message {
 
 const P2P_PORT = process.env.P2P_PORT
   ? Number.parseInt(process.env.P2P_PORT)
-  : 5001;
+  : 5000;
 
 const peers = process.env.PEERS ? process.env.PEERS?.split(",") : [];
 
