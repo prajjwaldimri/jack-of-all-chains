@@ -47,9 +47,22 @@ setTimeout(() => {
 
 setTimeout(async () => {
   try {
+    let postPeer1, postPeer2, postPeer3;
     for (let i = 0; i < 40; i++) {
       // Create transactions
       const post = bent(`http://localhost:3333/`, "POST", "json", 200);
+      postPeer1 = bent(
+        `http://localhost:${peer_ports[0]}/`,
+        "POST",
+        "json",
+        200
+      );
+      postPeer2 = bent(
+        `http://localhost:${peer_ports[1]}/`,
+        "POST",
+        "json",
+        200
+      );
       await post("api/transact", {
         data: { transactionValue: Math.random() * 100 },
       });
@@ -60,21 +73,27 @@ setTimeout(async () => {
       `http://localhost:3333/api/transaction-pool`
     );
 
-    const postPeer1 = bent(
-      `http://localhost:${peer_ports[0]}/`,
-      "POST",
-      "json",
-      200
-    );
-    const block = await postPeer1("api/pow/mineBlock", {
-      data: transactionPool.transactions,
+    mineBlock(postPeer1, transactionPool.transactions).then(async (block) => {
+      await postPeer1("api/pow/addBlock", { data: block });
     });
 
-    await postPeer1("api/pow/addBlock", { data: block });
+    mineBlock(postPeer2, transactionPool.transactions).then(async (block) => {
+      await postPeer2("api/pow/addBlock", { data: block });
+    });
   } catch (err) {
     console.log(err);
   }
 }, 3000);
+
+const mineBlock = (postPeer, transactions) => {
+  return new Promise(async (resolve, reject) => {
+    resolve(
+      await postPeer("api/pow/mineBlock", {
+        data: transactions,
+      })
+    );
+  });
+};
 
 /* Cleanup Logic */
 setTimeout(() => {
