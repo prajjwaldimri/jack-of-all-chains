@@ -18,12 +18,16 @@ let chain = new POW_Chain();
 let transactionPool = new TransactionPool();
 let pubsub = new Pubsub(transactionPool, chain);
 
+//#region Front-end
 app.use(express.static(path.join(__dirname, "../client/public")));
 
 app.get("/", (req, res) => {
   res.status(200).sendFile(path.join(__dirname, "../client/index.html"));
 });
 
+//#endregion
+
+//#region Common chain related endpoints
 app.get("/api/chain", (req, res) => {
   res.status(200).json(chain);
 });
@@ -42,8 +46,9 @@ app.post("/api/transact", (req, res) => {
 
   res.status(200).json(transaction);
 });
+//#endregion
 
-// POW Endpoints
+//#region POW Endpoints
 app.post("/api/pow/mineBlock", (req, res) => {
   const { data } = req.body;
 
@@ -65,7 +70,7 @@ app.post("/api/pow/addBlock", (req, res) => {
   res.json(chain);
 });
 
-// POS Endpoints
+//#endregion
 
 const DEFAULT_PORT = 3333;
 
