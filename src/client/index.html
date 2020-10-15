@@ -107,6 +107,13 @@
 
   <script>
     MicroModal.init();
+    var ID = function () {
+      // Math.random should be unique because of its seeding algorithm.
+      // Convert it to base 36 (numbers + letters), and grab the first 9 characters
+      // after the decimal.
+      return "_" + Math.random().toString(36).substr(2, 9);
+    };
+
     var cy = cytoscape({
       container: document.getElementById("cy"),
       style: [
@@ -165,14 +172,13 @@
         nodeData.blockHeader.dataHash;
 
       let table = document.getElementById("transactionTable");
-
-      console.log(nodeData.blockData);
+      table.innerHTML = "";
 
       for (const transaction in nodeData.blockData.transactions) {
         let row = table.insertRow(0);
         let cell1 = row.insertCell(0);
         let cell2 = row.insertCell(1);
-        cell1.innerText = transaction;
+        cell1.innerText = `${nodeData.blockData.transactions[transaction].id}`;
         cell2.innerText = `${nodeData.blockData.transactions[transaction].createdBy}`;
       }
 
@@ -184,46 +190,47 @@
     let xPosition = 100;
     let yPosition = 100;
 
-    fetch(`${window.location.origin}/api/chain/getAfter/${currentBlocks}`).then(
-      (response) => {
-        response.json().then((data) => {
-          data.blocks.forEach((block) => {
-            if (prevBlockId) {
-              cy.add([
-                {
-                  group: "nodes",
-                  data: {
-                    id: block.blockNumber.toString(),
-                    block: block,
-                  },
-                  position: { x: xPosition, y: yPosition },
-                },
-                {
-                  group: "edges",
-                  data: {
-                    id: "e1",
-                    source: block.blockNumber.toString(),
-                    target: prevBlockId,
-                  },
-                },
-              ]);
-            } else {
-              prevBlockId = block.blockNumber.toString();
-              cy.add({
-                group: "nodes",
-                data: {
-                  id: block.blockNumber.toString(),
-                  block: block,
-                },
-                position: { x: xPosition, y: yPosition },
-              });
-            }
-            xPosition += 200;
+    setInterval(async () => {
+      const response = await fetch(
+        `${window.location.origin}/api/chain/getAfter/${currentBlocks}`
+      );
+      const data = await response.json();
+      currentBlocks += data.blocks.length;
+      data.blocks.forEach((block) => {
+        if (prevBlockId) {
+          cy.add([
+            {
+              group: "nodes",
+              data: {
+                id: block.blockNumber.toString(),
+                block: block,
+              },
+              position: { x: xPosition, y: yPosition },
+            },
+            {
+              group: "edges",
+              data: {
+                id: ID(),
+                source: block.blockNumber.toString(),
+                target: prevBlockId,
+              },
+            },
+          ]);
+        } else {
+          cy.add({
+            group: "nodes",
+            data: {
+              id: block.blockNumber.toString(),
+              block: block,
+            },
+            position: { x: xPosition, y: yPosition },
           });
-          cy.fit();
-        });
-      }
-    );
+        }
+        prevBlockId = block.blockNumber.toString();
+        xPosition += 200;
+      });
+      cy.fit();
+    }, 500);
   </script>
 
   <style>

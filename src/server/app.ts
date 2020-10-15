@@ -1,8 +1,15 @@
 import path from "path";
 import express from "express";
 let app = express();
+
 import bodyParser from "body-parser";
 app.use(bodyParser.json());
+
+import cors from "cors";
+app.use(cors());
+
+import compression from "compression";
+app.use(compression());
 
 const clone = require("rfdc")();
 

@@ -14,8 +14,8 @@ class POW_Block {
     blockHeader: BlockHeader,
     blockData: BlockData,
     blockHash: string,
-    blockNumber?: number,
-    timeTakenToMine?: number
+    timeTakenToMine?: number,
+    blockNumber?: number
   ) {
     this.blockData = blockData;
     this.blockHeader = blockHeader;
@@ -74,8 +74,8 @@ class POW_Block {
     let hash = "";
     let difficulty =
       prevBlock.timeTakenToMine < 1000
-        ? prevBlock.blockHeader.difficulty - 1
-        : prevBlock.blockHeader.difficulty + 1;
+        ? prevBlock.blockHeader.difficulty + 1
+        : prevBlock.blockHeader.difficulty - 1;
 
     let blockHeader = new BlockHeader(prevBlock.blockHash, difficulty);
     blockHeader.dataHash = hasher(blockData);

@@ -47,10 +47,10 @@ setTimeout(() => {
 
 setTimeout(async () => {
   try {
-    let postPeer1, postPeer2, postPeer3;
-    for (let i = 0; i < 40; i++) {
+    let post, postPeer1, postPeer2, postPeer3;
+    for (let i = 0; i < 50; i++) {
       // Create transactions
-      const post = bent(`http://localhost:3333/`, "POST", "json", 200);
+      post = bent(`http://localhost:3333/`, "POST", "json", 200);
       postPeer1 = bent(
         `http://localhost:${peer_ports[0]}/`,
         "POST",
@@ -63,7 +63,22 @@ setTimeout(async () => {
         "json",
         200
       );
+      postPeer3 = bent(
+        `http://localhost:${peer_ports[2]}/`,
+        "POST",
+        "json",
+        200
+      );
       await post("api/transact", {
+        data: { transactionValue: Math.random() * 100 },
+      });
+      await postPeer1("api/transact", {
+        data: { transactionValue: Math.random() * 100 },
+      });
+      await postPeer2("api/transact", {
+        data: { transactionValue: Math.random() * 100 },
+      });
+      await postPeer3("api/transact", {
         data: { transactionValue: Math.random() * 100 },
       });
     }
@@ -73,13 +88,50 @@ setTimeout(async () => {
       `http://localhost:3333/api/transaction-pool`
     );
 
-    mineBlock(postPeer1, transactionPool.transactions).then(async (block) => {
-      await postPeer1("api/pow/addBlock", { data: block });
-    });
+    let i = 0,
+      j = 51,
+      k = 101,
+      l = 151;
 
-    mineBlock(postPeer2, transactionPool.transactions).then(async (block) => {
+    while (i < 5) {
+      const block = await mineBlock(post, [
+        transactionPool.transactions[
+          Object.keys(transactionPool.transactions)[i]
+        ],
+      ]);
+      await post("api/pow/addBlock", { data: block });
+      i++;
+    }
+
+    while (j < 60) {
+      const block = await mineBlock(postPeer1, [
+        transactionPool.transactions[
+          Object.keys(transactionPool.transactions)[j]
+        ],
+      ]);
+      await postPeer1("api/pow/addBlock", { data: block });
+      j++;
+    }
+
+    while (k < 115) {
+      const block = await mineBlock(postPeer2, [
+        transactionPool.transactions[
+          Object.keys(transactionPool.transactions)[k]
+        ],
+      ]);
       await postPeer2("api/pow/addBlock", { data: block });
-    });
+      k++;
+    }
+
+    while (l < 167) {
+      const block = await mineBlock(postPeer3, [
+        transactionPool.transactions[
+          Object.keys(transactionPool.transactions)[l]
+        ],
+      ]);
+      await postPeer3("api/pow/addBlock", { data: block });
+      l++;
+    }
   } catch (err) {
     console.log(err);
   }
