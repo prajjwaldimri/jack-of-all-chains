@@ -4,6 +4,8 @@ let app = express();
 import bodyParser from "body-parser";
 app.use(bodyParser.json());
 
+const clone = require("rfdc")();
+
 import bent from "bent";
 const getJSON = bent("json");
 
@@ -30,6 +32,14 @@ app.get("/", (req, res) => {
 //#region Common chain related endpoints
 app.get("/api/chain", (req, res) => {
   res.status(200).json(chain);
+});
+
+app.get("/api/chain/getAfter/:after", (req, res) => {
+  let tempChain = clone(chain);
+  tempChain.blocks = tempChain.blocks.splice(
+    Math.abs(Number.parseInt(req.params.after))
+  );
+  res.status(200).json(tempChain);
 });
 
 app.get("/api/transaction-pool", (req, res) => {

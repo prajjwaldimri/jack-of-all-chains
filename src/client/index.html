@@ -9,31 +9,120 @@
       integrity="sha512-90CUvhfbtRMgSr2cvzgYyGchUg2CtOHMavYdm03huN42UAjWtKhHBsQ+H7K4KGJ4MeS0P9FiZZwC7lxnIl6isg=="
       crossorigin="anonymous"
     ></script>
+    <script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
   </head>
   <body>
     <div id="cy"></div>
+    <div class="modal micromodal-slide" id="modal-1" aria-hidden="true">
+      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+        <div
+          class="modal__container"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-1-title"
+        >
+          <header class="modal__header">
+            <h2 class="modal__title" id="modal-1-title"></h2>
+            <button
+              class="modal__close"
+              aria-label="Close modal"
+              data-micromodal-close
+            ></button>
+          </header>
+          <main class="modal__content" id="modal-1-content">
+            <table>
+              <tbody>
+                <tr>
+                  <td>BlockHash</td>
+                  <td id="blockHash"></td>
+                </tr>
+                <tr>
+                  <td>Time taken to Mine (ms)</td>
+                  <td id="timeTakenToMine"></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table>
+              <thead>
+                <h2
+                  class="modal__title"
+                  style="margin-top: 2rem; margin-bottom: 1.4rem"
+                >
+                  Block Header
+                </h2>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Version</td>
+                  <td id="version"></td>
+                </tr>
+                <tr>
+                  <td>Previous Block Hash</td>
+                  <td id="prevBlockHash"></td>
+                </tr>
+                <tr>
+                  <td>Timestamp</td>
+                  <td id="timestamp"></td>
+                </tr>
+                <tr>
+                  <td>Nonce</td>
+                  <td id="nonce"></td>
+                </tr>
+                <tr>
+                  <td>Extra Nonce</td>
+                  <td id="extraNonce"></td>
+                </tr>
+                <tr>
+                  <td>Difficulty</td>
+                  <td id="difficulty"></td>
+                </tr>
+                <tr>
+                  <td>Data Hash</td>
+                  <td id="dataHash"></td>
+                </tr>
+              </tbody>
+            </table>
+            <table id="transactionTable">
+              <thead>
+                <h2
+                  class="modal__title"
+                  style="margin-top: 2rem; margin-bottom: 1.4rem"
+                >
+                  Block Data
+                </h2>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </main>
+          <footer class="modal__footer">
+            <button class="modal__btn modal__btn-primary" data-micromodal-close>
+              Close
+            </button>
+          </footer>
+        </div>
+      </div>
+    </div>
   </body>
 
-  <style>
-    #cy {
-      width: 100vw;
-      height: 100vh;
-      display: block;
-    }
-  </style>
-
   <script>
+    MicroModal.init();
     var cy = cytoscape({
       container: document.getElementById("cy"),
-      elements: [
-        { data: { id: "a" } },
-        { data: { id: "b" } },
-        { data: { id: "ab", source: "a", target: "b" } },
-      ],
       style: [
         {
           selector: "node",
-          style: { "background-color": "#666", label: "data(id)" },
+          style: {
+            "background-color": "#666",
+            label: "data(id)",
+            shape: "round-rectangle",
+            "text-halign": "center",
+            "text-valign": "bottom",
+            "text-wrap": "wrap",
+            "text-max-width": "150px",
+            "line-height": "1.5",
+            "text-margin-y": "10px",
+          },
         },
         {
           selector: "edge",
@@ -51,5 +140,290 @@
         rows: 1,
       },
     });
+
+    cy.on("tap", "node", (evt) => {
+      let nodeData = evt.target.data().block;
+      document.getElementById(
+        "modal-1-title"
+      ).innerText = `Block: ${nodeData.blockNumber}`;
+
+      document.getElementById("blockHash").innerText = nodeData.blockHash;
+      document.getElementById("timeTakenToMine").innerText =
+        nodeData.timeTakenToMine;
+      document.getElementById("version").innerText =
+        nodeData.blockHeader.version;
+      document.getElementById("prevBlockHash").innerText =
+        nodeData.blockHeader.prevBlockHash;
+      document.getElementById("timestamp").innerText =
+        nodeData.blockHeader.timestamp;
+      document.getElementById("nonce").innerText = nodeData.blockHeader.nonce;
+      document.getElementById("extraNonce").innerText =
+        nodeData.blockHeader.extraNonce;
+      document.getElementById("difficulty").innerText =
+        nodeData.blockHeader.difficulty;
+      document.getElementById("dataHash").innerText =
+        nodeData.blockHeader.dataHash;
+
+      let table = document.getElementById("transactionTable");
+
+      console.log(nodeData.blockData);
+
+      for (const transaction in nodeData.blockData.transactions) {
+        let row = table.insertRow(0);
+        let cell1 = row.insertCell(0);
+        let cell2 = row.insertCell(1);
+        cell1.innerText = transaction;
+        cell2.innerText = `${nodeData.blockData.transactions[transaction].createdBy}`;
+      }
+
+      MicroModal.show("modal-1");
+    });
+
+    let currentBlocks = 0;
+    let prevBlockId = null;
+    let xPosition = 100;
+    let yPosition = 100;
+
+    fetch(`${window.location.origin}/api/chain/getAfter/${currentBlocks}`).then(
+      (response) => {
+        response.json().then((data) => {
+          data.blocks.forEach((block) => {
+            if (prevBlockId) {
+              cy.add([
+                {
+                  group: "nodes",
+                  data: {
+                    id: block.blockNumber.toString(),
+                    block: block,
+                  },
+                  position: { x: xPosition, y: yPosition },
+                },
+                {
+                  group: "edges",
+                  data: {
+                    id: "e1",
+                    source: block.blockNumber.toString(),
+                    target: prevBlockId,
+                  },
+                },
+              ]);
+            } else {
+              prevBlockId = block.blockNumber.toString();
+              cy.add({
+                group: "nodes",
+                data: {
+                  id: block.blockNumber.toString(),
+                  block: block,
+                },
+                position: { x: xPosition, y: yPosition },
+              });
+            }
+            xPosition += 200;
+          });
+          cy.fit();
+        });
+      }
+    );
   </script>
+
+  <style>
+    #cy {
+      width: 100vw;
+      height: 80vh;
+      display: block;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid black;
+      word-wrap: anywhere;
+    }
+
+    th,
+    td {
+      padding: 15px;
+      text-align: left;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    /**************************\
+  Basic Modal Styles
+\**************************/
+
+    .modal {
+      font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
+        helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial,
+        sans-serif;
+    }
+
+    .modal__overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal__container {
+      background-color: #fff;
+      padding: 30px;
+      max-width: 1000px;
+      max-height: 95vh;
+      border-radius: 4px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    .modal__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal__title {
+      margin-top: 0;
+      margin-bottom: 0;
+      font-weight: 600;
+      font-size: 1.25rem;
+      line-height: 1.25;
+      color: #00449e;
+      box-sizing: border-box;
+    }
+
+    .modal__close {
+      background: transparent;
+      border: 0;
+    }
+
+    .modal__header .modal__close:before {
+      content: "\2715";
+    }
+
+    .modal__content {
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+      color: rgba(0, 0, 0, 0.8);
+    }
+
+    .modal__btn {
+      font-size: 0.875rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      background-color: #e6e6e6;
+      color: rgba(0, 0, 0, 0.8);
+      border-radius: 0.25rem;
+      border-style: none;
+      border-width: 0;
+      cursor: pointer;
+      -webkit-appearance: button;
+      text-transform: none;
+      overflow: visible;
+      line-height: 1.15;
+      margin: 0;
+      will-change: transform;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      transition: -webkit-transform 0.25s ease-out;
+      transition: transform 0.25s ease-out;
+      transition: transform 0.25s ease-out, -webkit-transform 0.25s ease-out;
+    }
+
+    .modal__btn:focus,
+    .modal__btn:hover {
+      -webkit-transform: scale(1.05);
+      transform: scale(1.05);
+    }
+
+    .modal__btn-primary {
+      background-color: #00449e;
+      color: #fff;
+    }
+
+    /**************************\
+  Demo Animation Style
+\**************************/
+    @keyframes mmfadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes mmfadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+
+    @keyframes mmslideIn {
+      from {
+        transform: translateY(15%);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes mmslideOut {
+      from {
+        transform: translateY(0);
+      }
+      to {
+        transform: translateY(-10%);
+      }
+    }
+
+    .micromodal-slide {
+      display: none;
+    }
+
+    .micromodal-slide.is-open {
+      display: block;
+    }
+
+    .micromodal-slide[aria-hidden="false"] .modal__overlay {
+      animation: mmfadeIn 0.3s cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .micromodal-slide[aria-hidden="false"] .modal__container {
+      animation: mmslideIn 0.3s cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .micromodal-slide[aria-hidden="true"] .modal__overlay {
+      animation: mmfadeOut 0.3s cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .micromodal-slide[aria-hidden="true"] .modal__container {
+      animation: mmslideOut 0.3s cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .micromodal-slide .modal__container,
+    .micromodal-slide .modal__overlay {
+      will-change: transform;
+    }
+  </style>
 </html>

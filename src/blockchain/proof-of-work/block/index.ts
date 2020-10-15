@@ -7,17 +7,20 @@ class POW_Block {
   public blockData: BlockData;
   public blockHeader: BlockHeader;
   public blockHash: string;
+  public blockNumber: number;
   public timeTakenToMine: number;
 
   constructor(
     blockHeader: BlockHeader,
     blockData: BlockData,
     blockHash: string,
+    blockNumber?: number,
     timeTakenToMine?: number
   ) {
     this.blockData = blockData;
     this.blockHeader = blockHeader;
     this.blockHash = blockHash;
+    this.blockNumber = blockNumber || 0;
     this.timeTakenToMine = timeTakenToMine || 1000;
   }
 
