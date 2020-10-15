@@ -1,3 +1,4 @@
+import path from "path";
 import express from "express";
 let app = express();
 import bodyParser from "body-parser";
@@ -16,6 +17,12 @@ let wallet = new Wallet();
 let chain = new POW_Chain();
 let transactionPool = new TransactionPool();
 let pubsub = new Pubsub(transactionPool, chain);
+
+app.use(express.static(path.join(__dirname, "../client/public")));
+
+app.get("/", (req, res) => {
+  res.status(200).sendFile(path.join(__dirname, "../client/index.html"));
+});
 
 app.get("/api/chain", (req, res) => {
   res.status(200).json(chain);
