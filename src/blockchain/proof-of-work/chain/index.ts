@@ -20,7 +20,7 @@ class POW_Chain {
   replaceChain(chain: POW_Chain) {
     if (
       POW_Chain.isChainValid(chain) &&
-      chain.blocks.length > this.blocks.length
+      chain.blocks.length > this.blocks.length + 2
     ) {
       this.blocks = chain.blocks;
       this.currentBlockNumber = chain.currentBlockNumber;
