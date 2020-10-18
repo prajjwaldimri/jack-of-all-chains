@@ -145,8 +145,8 @@
         },
       ],
       layout: {
-        name: "grid",
-        rows: 1,
+        name: "preset",
+        // rows: 2,
       },
     });
 
@@ -187,15 +187,11 @@
       MicroModal.show("modal-1");
     });
 
-    let currentBlocks = 0;
-    let xPosition = 100;
-
     setIntervalAsync(async () => {
+      let xPosition_3333 = 100;
       const response = await fetch(`http://localhost:3333/api/chain/`);
       const data = await response.json();
-      let yPosition = 100;
-      // currentBlocks += data.blocks.length;
-      cy.elements().remove();
+      cy.remove(".3333");
       let prevBlockId = null;
       data.blocks.forEach((block) => {
         if (prevBlockId) {
@@ -203,83 +199,175 @@
             {
               group: "nodes",
               data: {
-                id: block.blockNumber.toString(),
+                id: `${block.blockNumber.toString()}_3333`,
                 block: block,
               },
-              position: { x: xPosition, y: yPosition },
+              classes: ["3333"],
+              position: { x: xPosition_3333, y: 100 },
             },
             {
               group: "edges",
               data: {
                 id: ID(),
-                source: block.blockNumber.toString(),
+                source: `${block.blockNumber.toString()}_3333`,
                 target: prevBlockId,
               },
+              classes: ["3333"],
             },
           ]);
         } else {
           cy.add({
             group: "nodes",
             data: {
-              id: block.blockNumber.toString(),
+              id: `${block.blockNumber.toString()}_3333`,
               block: block,
             },
-            position: { x: xPosition, y: yPosition },
+            classes: ["3333"],
+            position: { x: xPosition_3333, y: 100 },
           });
         }
-        prevBlockId = block.blockNumber.toString();
-        xPosition += 200;
+        prevBlockId = `${block.blockNumber.toString()}_3333`;
+        xPosition_3333 += 200;
       });
-      cy.fit();
-    }, 3000);
+    }, 2000);
 
-    // setInterval(async () => {
-    //   const response = await fetch(`http://localhost:10000/api/chain/`);
-    //   const data = await response.json();
-    //   let yPosition = 300;
-    //   // currentBlocks += data.blocks.length;
-    //   cy.remove();
-    //   data.blocks.forEach((block) => {
-    //     if (prevBlockId) {
-    //       cy.add([
-    //         {
-    //           group: "nodes_10000",
-    //           data: {
-    //             id: block.blockNumber.toString(),
-    //             block: block,
-    //           },
-    //           position: { x: xPosition, y: yPosition },
-    //         },
-    //         {
-    //           group: "edges_10000",
-    //           data: {
-    //             id: ID(),
-    //             source: block.blockNumber.toString(),
-    //             target: prevBlockId,
-    //           },
-    //         },
-    //       ]);
-    //     } else {
-    //       cy.add({
-    //         group: "nodes_10000",
-    //         data: {
-    //           id: block.blockNumber.toString(),
-    //           block: block,
-    //         },
-    //         position: { x: xPosition, y: yPosition },
-    //       });
-    //     }
-    //     prevBlockId = block.blockNumber.toString();
-    //     xPosition += 200;
-    //   });
-    //   cy.fit();
-    // }, 3000);
+    setIntervalAsync(async () => {
+      let xPosition_10000 = 100;
+      const response = await fetch(`http://localhost:10000/api/chain/`);
+      const data = await response.json();
+      cy.remove(".10000");
+      let prevBlockId = null;
+      data.blocks.forEach((block) => {
+        if (prevBlockId) {
+          cy.add([
+            {
+              group: "nodes",
+              data: {
+                id: `${block.blockNumber.toString()}_10000`,
+                block: block,
+              },
+              classes: ["10000"],
+              position: { x: xPosition_10000, y: 300 },
+            },
+            {
+              group: "edges",
+              data: {
+                id: ID(),
+                source: `${block.blockNumber.toString()}_10000`,
+                target: prevBlockId,
+              },
+              classes: ["10000"],
+            },
+          ]);
+        } else {
+          cy.add({
+            group: "nodes",
+            data: {
+              id: `${block.blockNumber.toString()}_10000`,
+              block: block,
+            },
+            classes: ["10000"],
+            position: { x: xPosition_10000, y: 300 },
+          });
+        }
+        prevBlockId = `${block.blockNumber.toString()}_10000`;
+        xPosition_10000 += 200;
+      });
+    }, 2000);
+
+    setIntervalAsync(async () => {
+      let xPosition_10001 = 100;
+      const response = await fetch(`http://localhost:10001/api/chain/`);
+      const data = await response.json();
+      cy.remove(".10001");
+      let prevBlockId = null;
+      data.blocks.forEach((block) => {
+        if (prevBlockId) {
+          cy.add([
+            {
+              group: "nodes",
+              data: {
+                id: `${block.blockNumber.toString()}_10001`,
+                block: block,
+              },
+              classes: ["10001"],
+              position: { x: xPosition_10001, y: 500 },
+            },
+            {
+              group: "edges",
+              data: {
+                id: ID(),
+                source: `${block.blockNumber.toString()}_10001`,
+                target: prevBlockId,
+              },
+              classes: ["10001"],
+            },
+          ]);
+        } else {
+          cy.add({
+            group: "nodes",
+            data: {
+              id: `${block.blockNumber.toString()}_10001`,
+              block: block,
+            },
+            classes: ["10001"],
+            position: { x: xPosition_10001, y: 500 },
+          });
+        }
+        prevBlockId = `${block.blockNumber.toString()}_10001`;
+        xPosition_10001 += 200;
+      });
+    }, 2000);
+
+    setIntervalAsync(async () => {
+      let xPosition_10002 = 100;
+      const response = await fetch(`http://localhost:10002/api/chain/`);
+      const data = await response.json();
+      cy.remove(".10002");
+      let prevBlockId = null;
+      data.blocks.forEach((block) => {
+        if (prevBlockId) {
+          cy.add([
+            {
+              group: "nodes",
+              data: {
+                id: `${block.blockNumber.toString()}_10002`,
+                block: block,
+              },
+              classes: ["10002"],
+              position: { x: xPosition_10002, y: 700 },
+            },
+            {
+              group: "edges",
+              data: {
+                id: ID(),
+                source: `${block.blockNumber.toString()}_10002`,
+                target: prevBlockId,
+              },
+              classes: ["10002"],
+            },
+          ]);
+        } else {
+          cy.add({
+            group: "nodes",
+            data: {
+              id: `${block.blockNumber.toString()}_10002`,
+              block: block,
+            },
+            classes: ["10002"],
+            position: { x: xPosition_10002, y: 700 },
+          });
+        }
+        prevBlockId = `${block.blockNumber.toString()}_10002`;
+        xPosition_10002 += 200;
+      });
+    }, 2000);
   </script>
 
   <style>
     #cy {
       width: 100vw;
-      height: 80vh;
+      height: 95vh;
       display: block;
     }
 

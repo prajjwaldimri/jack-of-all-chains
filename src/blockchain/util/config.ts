@@ -1,7 +1,7 @@
 const GENESIS_BLOCK_DATA_POW = {
   timestamp: 1,
   prevBlockHash: "---",
-  difficulty: 8,
+  difficulty: 15,
   nonce: 1,
   extraNonce: 0,
 };
