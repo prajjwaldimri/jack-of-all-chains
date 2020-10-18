@@ -10,6 +10,7 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
+    <script src="https://unpkg.com/set-interval-async"></script>
   </head>
   <body>
     <div id="cy"></div>
@@ -106,6 +107,7 @@
   </body>
 
   <script>
+    var setIntervalAsync = SetIntervalAsync.dynamic.setIntervalAsync;
     MicroModal.init();
     var ID = function () {
       // Math.random should be unique because of its seeding algorithm.
@@ -186,16 +188,15 @@
     });
 
     let currentBlocks = 0;
-    let prevBlockId = null;
     let xPosition = 100;
-    let yPosition = 100;
 
-    setInterval(async () => {
-      const response = await fetch(
-        `${window.location.origin}/api/chain/getAfter/${currentBlocks}`
-      );
+    setIntervalAsync(async () => {
+      const response = await fetch(`http://localhost:3333/api/chain/`);
       const data = await response.json();
-      currentBlocks += data.blocks.length;
+      let yPosition = 100;
+      // currentBlocks += data.blocks.length;
+      cy.elements().remove();
+      let prevBlockId = null;
       data.blocks.forEach((block) => {
         if (prevBlockId) {
           cy.add([
@@ -230,7 +231,49 @@
         xPosition += 200;
       });
       cy.fit();
-    }, 500);
+    }, 3000);
+
+    // setInterval(async () => {
+    //   const response = await fetch(`http://localhost:10000/api/chain/`);
+    //   const data = await response.json();
+    //   let yPosition = 300;
+    //   // currentBlocks += data.blocks.length;
+    //   cy.remove();
+    //   data.blocks.forEach((block) => {
+    //     if (prevBlockId) {
+    //       cy.add([
+    //         {
+    //           group: "nodes_10000",
+    //           data: {
+    //             id: block.blockNumber.toString(),
+    //             block: block,
+    //           },
+    //           position: { x: xPosition, y: yPosition },
+    //         },
+    //         {
+    //           group: "edges_10000",
+    //           data: {
+    //             id: ID(),
+    //             source: block.blockNumber.toString(),
+    //             target: prevBlockId,
+    //           },
+    //         },
+    //       ]);
+    //     } else {
+    //       cy.add({
+    //         group: "nodes_10000",
+    //         data: {
+    //           id: block.blockNumber.toString(),
+    //           block: block,
+    //         },
+    //         position: { x: xPosition, y: yPosition },
+    //       });
+    //     }
+    //     prevBlockId = block.blockNumber.toString();
+    //     xPosition += 200;
+    //   });
+    //   cy.fit();
+    // }, 3000);
   </script>
 
   <style>

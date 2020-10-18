@@ -23,6 +23,7 @@ class POW_Chain {
       chain.blocks.length > this.blocks.length
     ) {
       this.blocks = chain.blocks;
+      this.currentBlockNumber = chain.currentBlockNumber;
     }
   }
 
