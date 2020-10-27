@@ -17,7 +17,7 @@ import bent from "bent";
 const getJSON = bent("json");
 
 import Wallet from "../blockchain/wallet";
-import Pubsub from "./pubsub";
+import Pubsub from "./pubsub-pow";
 import { POW_Block, POW_Chain } from "../blockchain/proof-of-work";
 import TransactionPool from "../blockchain/wallet/transactionPool";
 import BlockData from "../blockchain/proof-of-work/block/blockData";
@@ -31,7 +31,7 @@ let pubsub = new Pubsub(transactionPool, chain);
 app.use(express.static(path.join(__dirname, "../client/public")));
 
 app.get("/", (req, res) => {
-  res.status(200).sendFile(path.join(__dirname, "../client/index.html"));
+  res.status(200).sendFile(path.join(__dirname, "../client/index-pow.html"));
 });
 
 //#endregion

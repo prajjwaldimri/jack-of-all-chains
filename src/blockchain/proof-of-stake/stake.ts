@@ -19,13 +19,19 @@ class Stake {
     this.balance[address] += amount;
   }
 
+  diluteStake(address: string) {
+    if (this.balance[address] != undefined) {
+      this.balance[address] -= this.balance[address] * 0.005;
+    }
+  }
+
   getStake(address: string) {
     return this.balance[address];
   }
 
-  getMaxStakeAddress() {
+  getMaxStakeAddress(): string {
     let balance = -1;
-    let leader = undefined;
+    let leader = "";
     this.addresses.forEach((address) => {
       if (this.getStake(address) > balance) {
         leader = address;

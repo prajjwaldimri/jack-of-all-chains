@@ -5,12 +5,14 @@ import Transaction from "./transaction";
 
 class Wallet {
   public publicKey: string;
+  public balance: number;
   private keyPair: ec.KeyPair;
 
   constructor() {
     this.keyPair = elliptic.genKeyPair();
 
     this.publicKey = this.keyPair.getPublic().encode("hex", true);
+    this.balance = 100;
   }
 
   sign(data: object) {
@@ -25,6 +27,10 @@ class Wallet {
       this.publicKey,
       this.sign(data)
     );
+  }
+
+  stake(stakeValue: number) {
+    this.balance -= stakeValue;
   }
 }
 

@@ -7,11 +7,11 @@ const peer_ports = [10000, 10001, 10002];
 const p2p_ports = [5001, 5002, 5003];
 
 /* Startup Logic */
-const server = spawn("npm", ["run", "start-server"]);
+const server = spawn("npm", ["run", "start-server-pow"]);
 let peer1, peer2, peer3;
 
 setTimeout(() => {
-  peer1 = spawn("npm", ["run", "start-peer"], {
+  peer1 = spawn("npm", ["run", "start-peer-pow"], {
     env: {
       PATH: process.env.PATH,
       PEER_PORT: peer_ports[0],
@@ -22,7 +22,7 @@ setTimeout(() => {
 }, 100);
 
 setTimeout(() => {
-  peer2 = spawn("npm", ["run", "start-peer"], {
+  peer2 = spawn("npm", ["run", "start-peer-pow"], {
     env: {
       PATH: process.env.PATH,
       PEER_PORT: peer_ports[1],
@@ -33,7 +33,7 @@ setTimeout(() => {
 }, 200);
 
 setTimeout(() => {
-  peer3 = spawn("npm", ["run", "start-peer"], {
+  peer3 = spawn("npm", ["run", "start-peer-pow"], {
     env: {
       PATH: process.env.PATH,
       PEER_PORT: peer_ports[2],

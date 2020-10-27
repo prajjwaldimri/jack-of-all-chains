@@ -1,18 +1,22 @@
 import WebSocket, { Server } from "ws";
+import { Stake } from "../blockchain/proof-of-stake";
 import POS_Chain from "../blockchain/proof-of-stake/chain";
-import POW_Chain from "../blockchain/proof-of-work/chain";
 import Transaction from "../blockchain/wallet/transaction";
 import TransactionPool from "../blockchain/wallet/transactionPool";
 
 const CHANNELS = {
   BLOCKCHAIN: "BLOCKCHAIN",
   TRANSACTION: "TRANSACTION",
+  STAKE: "STAKE",
 };
 
 interface Message {
   type: String;
   transaction?: Transaction;
-  chain?: POS_Chain | POW_Chain;
+  chain?: POS_Chain;
+  stake?: number;
+  address?: string;
+  electedMinerAddress?: string;
 }
 
 const P2P_PORT = process.env.P2P_PORT
@@ -21,13 +25,15 @@ const P2P_PORT = process.env.P2P_PORT
 
 const peers = process.env.PEERS ? process.env.PEERS?.split(",") : [];
 
-class Pubsub {
+class PubsubPOS {
   public server: Server;
   public sockets: WebSocket[];
 
   constructor(
     public transactionPool: TransactionPool,
-    public chain: POW_Chain | POS_Chain
+    public chain: POS_Chain,
+    public stake: Stake,
+    public minerWithHighestStake: { [key: string]: string }
   ) {
     this.server = new WebSocket.Server({ port: P2P_PORT });
     this.sockets = [];
@@ -56,13 +62,9 @@ class Pubsub {
 
     switch (parsedMessage.type) {
       case CHANNELS.BLOCKCHAIN:
-        if (this.chain instanceof POW_Chain) {
-          this.chain.replaceChain(parsedMessage.chain as POW_Chain);
-        } else if (this.chain instanceof POS_Chain) {
-          this.chain.replaceChain(parsedMessage.chain as POS_Chain);
-        }
+        this.chain.replaceChain(parsedMessage.chain as POS_Chain);
         this.transactionPool.clearBlockchainTransactions(
-          parsedMessage.chain as POW_Chain | POS_Chain
+          parsedMessage.chain as POS_Chain
         );
         break;
 
@@ -72,13 +74,17 @@ class Pubsub {
         );
         break;
 
+      case CHANNELS.STAKE:
+        this.stake.addStake(
+          parsedMessage.address as string,
+          parsedMessage.stake as number
+        );
+        this.minerWithHighestStake.address = this.stake.getMaxStakeAddress();
+        break;
+
       default:
         break;
     }
-  }
-
-  broadcastTransaction(transaction: Transaction) {
-    this.sockets.forEach((socket) => this.sendTransaction(transaction, socket));
   }
 
   sendTransaction(transaction: Transaction, socket: WebSocket) {
@@ -90,7 +96,11 @@ class Pubsub {
     socket.send(JSON.stringify(message));
   }
 
-  sendChain(chain: POS_Chain | POW_Chain, socket: WebSocket) {
+  broadcastTransaction(transaction: Transaction) {
+    this.sockets.forEach((socket) => this.sendTransaction(transaction, socket));
+  }
+
+  sendChain(chain: POS_Chain, socket: WebSocket) {
     const message: Message = {
       type: CHANNELS.BLOCKCHAIN,
       chain: chain,
@@ -102,6 +112,20 @@ class Pubsub {
   broadcastChain() {
     this.sockets.forEach((socket) => this.sendChain(this.chain, socket));
   }
+
+  sendStake(address: string, stake: number, socket: WebSocket) {
+    const message: Message = {
+      type: CHANNELS.STAKE,
+      stake: stake,
+      address: address,
+    };
+
+    socket.send(JSON.stringify(message));
+  }
+
+  broadcastStake(address: string, stake: number) {
+    this.sockets.forEach((socket) => this.sendStake(address, stake, socket));
+  }
 }
 
-export default Pubsub;
+export default PubsubPOS;

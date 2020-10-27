@@ -6,8 +6,10 @@
   "scripts": {
     "start-blockchain": "tsnd --respawn --transpile-only --debug src/blockchain/index.ts",
     "compile-blockchain": "rimraf ./build && tsc",
-    "start-server": "tsnd --respawn --transpile-only src/server/app.ts",
-    "start-peer": "cross-env GENERATE_PEER_PORT='true' tsnd --respawn --transpile-only src/server/app.ts",
+    "start-server-pow": "tsnd --respawn --transpile-only src/server/powChain.ts",
+    "start-peer-pow": "cross-env GENERATE_PEER_PORT='true' tsnd --respawn --transpile-only src/server/powChain.ts",
+    "start-server-pos": "tsnd --respawn --transpile-only src/server/posChain.ts",
+    "start-peer-pos": "cross-env GENERATE_PEER_PORT='true' tsnd --respawn --transpile-only src/server/posChain.ts",
     "start-redis": "redis-server --daemonize yes",
     "test": "jest --watch"
   },

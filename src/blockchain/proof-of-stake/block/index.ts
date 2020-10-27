@@ -1,5 +1,6 @@
 import { GENESIS_BLOCK_DATA_POS } from "../../util/config";
 import hasher from "../../util/hasher";
+import Wallet from "../../wallet";
 import BlockData from "./blockData";
 import BlockHeader from "./blockHeader";
 
@@ -35,6 +36,7 @@ class POS_Block {
   static getGenesisBlock(): POS_Block {
     const genesisBlockHeader = new BlockHeader(
       GENESIS_BLOCK_DATA_POS.prevBlockHash,
+      "Universe",
       GENESIS_BLOCK_DATA_POS.timestamp
     );
     return new POS_Block(
@@ -44,10 +46,14 @@ class POS_Block {
     );
   }
 
-  static createBlock(blockData: BlockData, prevBlock: POS_Block): POS_Block {
+  static createBlock(
+    blockData: BlockData,
+    prevBlock: POS_Block,
+    wallet: Wallet
+  ): POS_Block {
     let hash = "";
 
-    let blockHeader = new BlockHeader(prevBlock.blockHash);
+    let blockHeader = new BlockHeader(prevBlock.blockHash, wallet.publicKey);
     blockHeader.dataHash = hasher(blockData);
 
     blockHeader.timestamp = Date.now();
