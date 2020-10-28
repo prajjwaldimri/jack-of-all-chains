@@ -32,8 +32,7 @@ class PubsubPOS {
   constructor(
     public transactionPool: TransactionPool,
     public chain: POS_Chain,
-    public stake: Stake,
-    public minerWithHighestStake: { [key: string]: string }
+    public stake: Stake
   ) {
     this.server = new WebSocket.Server({ port: P2P_PORT });
     this.sockets = [];
@@ -79,7 +78,6 @@ class PubsubPOS {
           parsedMessage.address as string,
           parsedMessage.stake as number
         );
-        this.minerWithHighestStake.address = this.stake.getMaxStakeAddress();
         break;
 
       default:
@@ -116,8 +114,8 @@ class PubsubPOS {
   sendStake(address: string, stake: number, socket: WebSocket) {
     const message: Message = {
       type: CHANNELS.STAKE,
-      stake: stake,
       address: address,
+      stake: stake,
     };
 
     socket.send(JSON.stringify(message));

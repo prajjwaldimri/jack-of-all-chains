@@ -9,6 +9,7 @@ class POS_Chain {
 
   addBlock(block: POS_Block) {
     if (!POS_Block.isBlockValid(block)) {
+      console.log("Block is not valid");
       return;
     }
     this.blocks.push(block);

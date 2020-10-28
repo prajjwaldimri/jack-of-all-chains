@@ -8,7 +8,7 @@ class Stake {
   }
 
   initialize(address: string) {
-    if (this.balance[address] == undefined) {
+    if (!this.balance[address]) {
       this.balance[address] = 0;
       this.addresses.push(address);
     }
@@ -20,7 +20,7 @@ class Stake {
   }
 
   diluteStake(address: string) {
-    if (this.balance[address] != undefined) {
+    if (this.balance[address]) {
       this.balance[address] -= this.balance[address] * 0.005;
     }
   }

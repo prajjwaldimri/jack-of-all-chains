@@ -28,9 +28,9 @@ let stake = new Stake();
 let transactionPool = new TransactionPool();
 let cachedTransactionPool = new TransactionPool();
 let cachedTransactions = 0;
-let minerWithHighestStake = { address: "" };
+
 let nextMinerSelectionTime = 0;
-let pubsub = new Pubsub(transactionPool, chain, stake, minerWithHighestStake);
+let pubsub = new Pubsub(transactionPool, chain, stake);
 
 //#region Front-end
 app.use(express.static(path.join(__dirname, "../client/public")));
@@ -78,7 +78,7 @@ app.get("/api/pos/getNextMinerSelectionTime", (req, res) => {
 app.post("/api/pos/addStake", (req, res) => {
   const { data } = req.body;
 
-  const stakeValue = Number.parseFloat(data.stake);
+  const stakeValue = Math.round(Number.parseFloat(data.stake));
   if (wallet.balance - stakeValue < 0) {
     res.status(403).send("Stake higher than balance");
   }
@@ -103,9 +103,11 @@ async function addBlock() {
   try {
     nextMinerSelectionTime = Date.now() + 5000;
 
-    console.log("Miner selected is", minerWithHighestStake.address);
+    let minerWithHighestStake = stake.getMaxStakeAddress();
 
-    if (minerWithHighestStake.address === wallet.publicKey) {
+    if (stake.getMaxStakeAddress().length < 1) return;
+
+    if (minerWithHighestStake === wallet.publicKey) {
       const data = [];
       for (let i = 0; i < cachedTransactions; i++) {
         data.push(
