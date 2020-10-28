@@ -110,7 +110,7 @@ setTimeout(async () => {
       } catch (err) {
         console.error(err);
       }
-    }, 2000);
+    }, 1000);
 
     setInterval(async () => {
       try {

@@ -110,11 +110,16 @@ async function addBlock() {
     if (minerWithHighestStake === wallet.publicKey) {
       const data = [];
       for (let i = 0; i < cachedTransactions; i++) {
-        data.push(
+        if (
           cachedTransactionPool.transactions[
-            Object.keys(transactionPool.transactions)[i]
+            Object.keys(cachedTransactionPool.transactions)[i]
           ]
-        );
+        )
+          data.push(
+            cachedTransactionPool.transactions[
+              Object.keys(cachedTransactionPool.transactions)[i]
+            ]
+          );
       }
 
       chain.addBlock(
@@ -129,6 +134,7 @@ async function addBlock() {
       stake.diluteStake(wallet.publicKey);
       pubsub.broadcastStake(wallet.publicKey, stake.getStake(wallet.publicKey));
       cachedTransactionPool.transactions = {};
+      cachedTransactions = 0;
     }
   } catch (err) {
     console.error(err);

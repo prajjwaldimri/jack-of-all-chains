@@ -7,16 +7,19 @@ import BlockHeader from "./blockHeader";
 class POS_Block {
   public blockData: BlockData;
   public blockHeader: BlockHeader;
+  public blockNumber: number;
   public blockHash: string;
 
   constructor(
     blockHeader: BlockHeader,
     blockData: BlockData,
-    blockHash: string
+    blockHash: string,
+    blockNumber?: number
   ) {
     this.blockData = blockData;
     this.blockHeader = blockHeader;
     this.blockHash = blockHash;
+    this.blockNumber = blockNumber || 0;
   }
 
   static isBlockValid(block: POS_Block): boolean {

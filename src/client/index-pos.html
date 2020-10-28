@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Blockchain proof of Work</title>
+    <title>Blockchain Proof of Stake</title>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.16.2/cytoscape.min.js"
       integrity="sha512-90CUvhfbtRMgSr2cvzgYyGchUg2CtOHMavYdm03huN42UAjWtKhHBsQ+H7K4KGJ4MeS0P9FiZZwC7lxnIl6isg=="
@@ -37,10 +37,6 @@
                   <td>BlockHash</td>
                   <td id="blockHash"></td>
                 </tr>
-                <tr>
-                  <td>Time taken to Mine (ms)</td>
-                  <td id="timeTakenToMine"></td>
-                </tr>
               </tbody>
             </table>
 
@@ -67,20 +63,12 @@
                   <td id="timestamp"></td>
                 </tr>
                 <tr>
-                  <td>Nonce</td>
-                  <td id="nonce"></td>
-                </tr>
-                <tr>
-                  <td>Extra Nonce</td>
-                  <td id="extraNonce"></td>
-                </tr>
-                <tr>
-                  <td>Difficulty</td>
-                  <td id="difficulty"></td>
-                </tr>
-                <tr>
                   <td>Data Hash</td>
                   <td id="dataHash"></td>
+                </tr>
+                <tr>
+                  <td>Creator</td>
+                  <td id="creator"></td>
                 </tr>
               </tbody>
             </table>
@@ -157,21 +145,17 @@
       ).innerText = `Block: ${nodeData.blockNumber}`;
 
       document.getElementById("blockHash").innerText = nodeData.blockHash;
-      document.getElementById("timeTakenToMine").innerText =
-        nodeData.timeTakenToMine;
+
       document.getElementById("version").innerText =
         nodeData.blockHeader.version;
       document.getElementById("prevBlockHash").innerText =
         nodeData.blockHeader.prevBlockHash;
       document.getElementById("timestamp").innerText =
         nodeData.blockHeader.timestamp;
-      document.getElementById("nonce").innerText = nodeData.blockHeader.nonce;
-      document.getElementById("extraNonce").innerText =
-        nodeData.blockHeader.extraNonce;
-      document.getElementById("difficulty").innerText =
-        nodeData.blockHeader.difficulty;
       document.getElementById("dataHash").innerText =
         nodeData.blockHeader.dataHash;
+        document.getElementById("creator").innerText =
+        nodeData.blockHeader.creator;
 
       let table = document.getElementById("transactionTable");
       table.innerHTML = "";

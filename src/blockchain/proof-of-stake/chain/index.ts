@@ -2,12 +2,15 @@ import POS_Block from "../block";
 
 class POS_Chain {
   public blocks: POS_Block[];
+  public currentBlockNumber = 1;
 
   constructor() {
     this.blocks = [POS_Block.getGenesisBlock()];
   }
 
   addBlock(block: POS_Block) {
+    block.blockNumber = this.currentBlockNumber;
+    this.currentBlockNumber += 1;
     if (!POS_Block.isBlockValid(block)) {
       console.log("Block is not valid");
       return;
@@ -21,6 +24,7 @@ class POS_Chain {
       chain.blocks.length > this.blocks.length
     ) {
       this.blocks = chain.blocks;
+      this.currentBlockNumber = chain.currentBlockNumber;
     }
   }
 
